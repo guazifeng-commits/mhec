@@ -1,0 +1,10 @@
+numpy>=1.18.0
+scipy>=1.4.0
+pandas>=1.0.0
+
+[full]
+matplotlib>=3.0.0
+pandas>=1.0.0
+
+[plot]
+matplotlib>=3.0.0
