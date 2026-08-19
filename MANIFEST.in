@@ -1,0 +1,21 @@
+include README_en.md
+include README_zh.md
+include LICENSE
+include pyproject.toml
+recursive-include mhec *.py
+
+# 示例与文档 (进 sdist 源码包, 不进 wheel)
+graft examples
+graft doc
+
+# ML_FF 保留
+global-exclude POTCAR
+
+prune mhec-old
+prune mhec-1.0.0
+prune core
+prune dist
+global-exclude *deform_strain_energy*
+global-exclude *elastic_analysis_se*
+global-exclude __pycache__
+global-exclude *.pyc

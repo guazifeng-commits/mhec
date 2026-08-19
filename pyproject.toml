@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=77.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mhec"
+version = "1.0.0"
+description = "MHEC: MLFF-accelerated High-temperature Elastic Constants (VASP AIMD + machine-learning force fields) with AIMD post-processing"
+readme = "README_en.md"
+requires-python = ">=3.7"
+license = "MIT"
+authors = [{ name = "Feng Xing", email = "fengxing@amgm.ac.cn" }]
+keywords = ["elastic constants", "machine learning force field", "AIMD", "VASP", "high temperature"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.18.0",
+    "scipy>=1.4.0",
+    "pandas>=1.0.0",
+]
+
+[project.optional-dependencies]
+plot = ["matplotlib>=3.0.0"]
+full = ["matplotlib>=3.0.0", "pandas>=1.0.0"]
+
+[project.scripts]
+mhec = "mhec.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["mhec*"]
