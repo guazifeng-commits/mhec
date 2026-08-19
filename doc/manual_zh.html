@@ -1,0 +1,986 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-HEC 软件使用说明书 V1.0</title>
+<style>
+  :root{
+    --brand:#0b5cad; --brand2:#159484; --ink:#1c2b36; --muted:#5b6b77;
+    --line:#d6dee4; --bg-soft:#f5f8fa; --code-bg:#f4f6f8; --warn:#b26a00; --warnbg:#fff7e6;
+    --note:#155e9c; --notebg:#eaf3fb; --danger:#b3261e; --dangerbg:#fdecea;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  body{
+    font-family:"Microsoft YaHei","PingFang SC","Segoe UI",Arial,sans-serif;
+    color:var(--ink); line-height:1.75; margin:0; font-size:15px; background:#fff;
+  }
+  .page{max-width:900px; margin:0 auto; padding:32px 40px;}
+  h1,h2,h3,h4{color:var(--brand); line-height:1.3; margin:1.4em 0 .6em;}
+  h1{font-size:26px; border-bottom:3px solid var(--brand); padding-bottom:.3em;}
+  h2{font-size:21px; border-left:6px solid var(--brand2); padding-left:12px; margin-top:1.8em;}
+  h3{font-size:17px; color:var(--brand2);}
+  h4{font-size:15px; color:var(--ink);}
+  p{margin:.5em 0;}
+  code{font-family:"Consolas","Courier New",monospace; background:var(--code-bg);
+       padding:1px 5px; border-radius:4px; font-size:.9em; color:#b3261e;}
+  pre{background:var(--code-bg); border:1px solid var(--line); border-left:4px solid var(--brand);
+      border-radius:6px; padding:12px 14px; overflow:auto; font-size:12.5px; line-height:1.5;}
+  pre code{background:none; color:#243b53; padding:0;}
+  table{border-collapse:collapse; width:100%; margin:1em 0; font-size:13.5px;}
+  th,td{border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top;}
+  th{background:var(--brand); color:#fff; font-weight:600;}
+  tr:nth-child(even) td{background:var(--bg-soft);}
+  .muted{color:var(--muted);}
+  .note,.warn,.danger{border-radius:6px; padding:10px 14px; margin:1em 0; font-size:14px;}
+  .note{background:var(--notebg); border-left:4px solid var(--note);}
+  .warn{background:var(--warnbg); border-left:4px solid var(--warn);}
+  .danger{background:var(--dangerbg); border-left:4px solid var(--danger);}
+  .tag{display:inline-block; background:var(--brand2); color:#fff; border-radius:4px;
+       padding:1px 8px; font-size:12px; margin-right:6px;}
+  ul,ol{margin:.4em 0 .8em; padding-left:1.6em;}
+  li{margin:.25em 0;}
+  a{color:var(--brand); text-decoration:none;}
+  .cover{height:960px; display:flex; flex-direction:column; justify-content:center;
+         align-items:center; text-align:center; border-bottom:none;}
+  .cover .logo{font-size:64px; font-weight:800; letter-spacing:4px; color:var(--brand);}
+  .cover .sub{font-size:20px; color:var(--ink); margin-top:8px;}
+  .cover .sub2{font-size:15px; color:var(--muted); margin-top:4px;}
+  .cover .meta{margin-top:60px; font-size:15px; color:var(--ink);}
+  .cover .meta div{margin:4px 0;}
+  .toc ol{list-style:none; padding-left:0;}
+  .toc > ol > li{font-weight:600; margin:.5em 0; border-bottom:1px dotted var(--line); padding-bottom:.2em;}
+  .toc ol ol{padding-left:1.4em; font-weight:400;}
+  .kbd{background:#eef2f5; border:1px solid #c7d2da; border-bottom-width:2px;
+       border-radius:4px; padding:0 6px; font-size:12.5px; font-family:monospace;}
+  .page-break{page-break-before:always;}
+  @page{ size:A4; margin:18mm 16mm 20mm; }
+  @media print{
+    .page{max-width:none; padding:0;}
+    h2{page-break-after:avoid;} h3{page-break-after:avoid;}
+    table,pre,.note,.warn,.danger{page-break-inside:avoid;}
+    .no-print{display:none;}
+  }
+  .toolbar{position:sticky; top:0; background:#fff; border-bottom:1px solid var(--line);
+           padding:8px 40px; font-size:13px; color:var(--muted); z-index:10;}
+  /* 图片与终端 */
+  figure.shot{margin:1.2em 0; text-align:center; page-break-inside:avoid;}
+  figure.shot img{max-width:100%; border:1px solid var(--line); border-radius:6px;
+                  box-shadow:0 1px 5px rgba(0,0,0,.10);}
+  figure.shot.small img{max-width:52%;}
+  figure.shot.wide img{max-width:100%;}
+  figure.shot figcaption{font-size:12.5px; color:var(--muted); margin-top:6px;}
+  .grid2{display:flex; gap:16px; flex-wrap:wrap; justify-content:center; align-items:flex-start;}
+  .grid2 figure{flex:1 1 44%; margin:.5em 0;}
+  .grid2 figure img{max-height:280px; width:auto;}
+  .grid3{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; align-items:flex-start;}
+  .grid3 figure{flex:1 1 30%; margin:.4em 0;}
+  .grid3 figure img{max-height:230px; width:auto;}
+  .term{background:#1e2733; border-radius:8px; margin:1em 0; overflow:hidden;
+        border:1px solid #0d1117; page-break-inside:avoid;}
+  .term .bar{background:#141b24; padding:6px 12px; color:#8b98a5; font-size:11px;
+             border-bottom:1px solid #0d1117;}
+  .term .dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:middle;}
+  .term .r{background:#ff5f56;} .term .y{background:#ffbd2e;} .term .g{background:#27c93f;}
+  .term pre{background:none; border:none; margin:0; padding:12px 14px; color:#d6e2ec;
+            font-family:"Consolas","Courier New",monospace; font-size:12px; line-height:1.5;}
+  .term .p{color:#7ee787;}   /* 提示符/成功 */
+  .term .i{color:#ffd479;}   /* 用户输入 */
+  .term .c{color:#7d8b98;}   /* 注释 */
+  .term .h{color:#79c0ff;}   /* 标题 */
+</style>
+</head>
+<body>
+<div class="toolbar no-print">
+  提示:在浏览器中按 <span class="kbd">Ctrl</span>+<span class="kbd">P</span> → 目标打印机选择“另存为 PDF” → 纸张 A4 → 勾选“背景图形” → 保存,即可导出 PDF。
+</div>
+
+<div class="page">
+
+<!-- ============ 封面 ============ -->
+<section class="cover">
+  <div class="logo">M&#8209;HEC</div>
+  <div class="sub">MLFF 加速的高温弹性常数计算软件</div>
+  <div class="sub2">MLFF-Enhanced High-Temperature Elastic Constants</div>
+  <div class="meta">
+    <div><strong>软件使用说明书</strong></div>
+    <div>版本 Version 1.0</div>
+    <div>开发者:冯幸 (Dr. Xing Feng)</div>
+    <div>联系邮箱:fengxing@amgm.ac.cn</div>
+  </div>
+</section>
+
+<div class="page-break"></div>
+
+<!-- ============ 目录 ============ -->
+<h1>目录</h1>
+<nav class="toc">
+<ol>
+  <li>1 软件简介
+    <ol>
+      <li>1.1 概述</li>
+      <li>1.2 主要功能</li>
+      <li>1.3 技术特色</li>
+      <li>1.4 软件模块构成</li>
+      <li>1.5 典型工作流程</li>
+      <li>1.6 适用范围与限制</li>
+    </ol>
+  </li>
+  <li>2 理论背景
+    <ol>
+      <li>2.1 应力-应变法计算弹性常数</li>
+      <li>2.2 MLFF 加速的高温采样</li>
+      <li>2.3 SC-SS 与 SA-SS 两种变形方案</li>
+      <li>2.4 奇多项式拟合与非谐偏置修正</li>
+      <li>2.5 Wallace 残余压力修正</li>
+      <li>2.6 力学性质与热力学量</li>
+    </ol>
+  </li>
+  <li>3 安装与运行环境
+    <ol>
+      <li>3.1 依赖环境</li>
+      <li>3.2 安装步骤</li>
+      <li>3.3 启动与卸载</li>
+      <li>3.4 界面语言(中 / 英双语)</li>
+    </ol>
+  </li>
+  <li>4 快速开始(金刚石完整算例)</li>
+  <li>5 主菜单总览</li>
+  <li>6 输入文件准备</li>
+  <li>7 功能详解
+    <ol>
+      <li>7.1 弹性常数计算(菜单 1–4)</li>
+      <li>7.2 后处理分析(菜单 5–6)</li>
+      <li>7.3 机器学习力场(菜单 7–9)</li>
+      <li>7.4 辅助工具(菜单 10–12)</li>
+      <li>7.5 全局设置(s)</li>
+    </ol>
+  </li>
+  <li>8 输出文件说明</li>
+  <li>9 参数参考与 mhec.yaml</li>
+  <li>10 命令行批处理模式</li>
+  <li>11 常见问题与注意事项(FAQ)</li>
+  <li>12 附录</li>
+</ol>
+</nav>
+
+<div class="page-break"></div>
+
+<!-- ============ 1 软件简介 ============ -->
+<h1>1 软件简介</h1>
+
+<h2>1.1 概述</h2>
+<p>
+M-HEC(<strong>M</strong>LFF-Enhanced <strong>H</strong>igh-temperature <strong>E</strong>lastic <strong>C</strong>onstants)是一款面向材料计算研究人员的、用于
+<strong>在第一性原理精度下高效计算材料有限温度(尤其是高温)弹性常数及力学性质</strong>的一体化命令行软件。
+</p>
+<p>
+<strong>要解决的问题。</strong> 弹性常数是材料力学性能、相稳定性、热力学与声学性质的基础物理量。传统上有两条路线各有短板:
+静态 DFT 只能给出 0 K 结果,无法反映高温软化;纯第一性原理分子动力学(AIMD)虽能包含温度效应,但在
+高温、大超胞、长时间采样下计算代价极其高昂,往往难以承受。M-HEC 通过引入 VASP 的
+<strong>机器学习力场(MLFF)</strong>,在保持 DFT 精度的同时把分子动力学采样成本降低若干数量级,
+使"<strong>高温、有限温度弹性常数</strong>"的规模化计算成为可实践的常规流程。
+</p>
+<p>
+<strong>核心工作方式。</strong> 软件对平衡结构施加一系列已知微小应变,用训练好的 MLFF 在各温度下做长时间 NVT
+分子动力学采样,提取时间平均应力,再以<strong>应力-应变法</strong>拟合出完整的 6×6 弹性常数矩阵;随后自动完成
+对称化、残余压力修正、Born 稳定性判据,并一站式导出 VRH 多晶模量、方向性各向异性曲面、德拜温度、声速
+等力学与热力学性质,同时提供可直接用于 Origin 作图的数据文件。
+</p>
+<p>
+<strong>使用体验。</strong> 软件采用<strong>单层交互式菜单</strong>,所有功能平铺呈现、无需记忆命令;
+配合 SLURM 集群<strong>一键提交脚本</strong>与自动任务依赖(NPT 优化 → 结构更新 → NVT 采样),
+覆盖<strong>从力场训练、精度验证、输入生成、任务提交、应力提取、弹性拟合到力学/AIMD 后处理</strong>的完整闭环。
+面向从事金属、合金、共价晶体、离子晶体、陶瓷、液态/熔体等体系高温力学性质研究的用户。
+</p>
+
+<h2>1.2 主要功能</h2>
+<p>M-HEC 按"力场 → 计算 → 后处理"的科研流程组织功能,主要包括六大模块:</p>
+<ul>
+  <li><strong>弹性常数计算(核心)</strong>:提供 SC-SS(单分量)与 SA-SS(对称化)两种应力-应变方案,
+      <strong>覆盖全部 9 个晶系</strong>(三斜/单斜/正交/四方 4-mmm 与 4-m/三方 -3m 与 -3/六方/立方);
+      自动识别晶系与最小充分变形集、按对称性生成变形结构、提取应力、拟合、对称化、残余压力修正、Born 稳定性判据;
+      支持<strong>多温度批量</strong>一次性生成与提交。</li>
+  <li><strong>MLFF 力场训练</strong>:两种训练策略——<strong>定温网格训练</strong>(在多个温度点分别采样)与
+      <strong>升温连续训练</strong>(一条升温轨迹覆盖整个温区并顺序续训);均采用<strong>应变增强训练</strong>,
+      在训练集中注入弹性应变构型以覆盖弹性线性区;训练/采样应变域自洽对齐;<code>LANGEVIN_GAMMA</code> 按元素种类自动展开;
+      物理参数(泛函、色散校正、展宽等)继承用户 INCAR。</li>
+  <li><strong>力场精度验证</strong>:解析 <code>ML_LOGFILE</code> 给出训练集 RMSE、贝叶斯误差与精度评级;
+      基于 <code>ML_AB</code> 的<strong>全数据集 parity 验证</strong>,对能量/力/<strong>应力</strong>逐一给出 RMSE/MAE/R² 与散点图。</li>
+  <li><strong>力学性质后处理</strong>:由弹性矩阵计算 VRH(Voigt/Reuss/Hill)多晶体/剪切/杨氏模量与泊松比、
+      各向异性指数(通用 A<sup>U</sup>、Zener)、方向性 E/G/ν/线压缩率的 <strong>3D 各向异性曲面与 2D 截面极图</strong>、
+      德拜温度、纵横声速与 Christoffel 方向声速、Clarke 最小热导率;所有图均附 Origin 数据。</li>
+  <li><strong>AIMD 后处理</strong>:对分子动力学轨迹做结构与输运分析——总/偏径向分布函数 RDF、
+      均方位移 MSD 与扩散系数(可分元素)、速度自相关 VACF 与声子态密度 PDOS、
+      <strong>Green-Kubo 粘度</strong>(块平均 + Bootstrap 置信区间)、静态结构因子 S(q)、配位数、键长键角分布、静水压力统计。</li>
+  <li><strong>辅助工具</strong>:晶系/空间群识别与晶格参数、化学式/摩尔质量/密度计算、
+      变形模式与应变方案预览、平衡晶格提取与热膨胀系数计算。</li>
+</ul>
+
+<h2>1.3 技术特色</h2>
+<ul>
+  <li><span class="tag">精度</span>MLFF 在 DFT 精度下实现高温大规模采样,兼顾精度与效率。</li>
+  <li><span class="tag">全晶系</span>三斜、单斜、正交、四方、三方、六方、立方等 9 个晶系均自动适配对称化与 Born 判据。</li>
+  <li><span class="tag">去偏置</span>默认采用<strong>过原点奇多项式(立方)拟合</strong>提取零应变切线,消除有限温 MD 应力-应变曲线的非谐偏置。</li>
+  <li><span class="tag">一致性</span>弹性计算强制使用同一已训练力场(<code>ML_MODE=run</code>)跑所有变形目录,保证结果自洽。</li>
+  <li><span class="tag">压力修正</span>Wallace/Brugger 残余压力修正,给出可与实验对比的推荐弹性常数。</li>
+  <li><span class="tag">参数继承</span>训练/计算的 INCAR 自动继承用户提供的物理参数(泛函 GGA、色散校正 D3、ISMEAR/SIGMA、LDAU、磁矩等),仅强制改写会破坏 MD/ML 流程的控制参数,适配不同材料体系。</li>
+  <li><span class="tag">自动化</span>SLURM 一键提交,自动编排"NPT 晶格优化 → 用优化晶格更新变形结构 → NVT 弹性采样"的任务依赖链。</li>
+  <li><span class="tag">数据友好</span>所有图形结果同时导出 Tab 分隔、带表头、按 C<sub>ij</sub> 命名的 Origin 数据文件,便于二次作图与制表。</li>
+  <li><span class="tag">鲁棒提取</span>应力提取同时解析 vasprun.xml 与 OUTCAR 并取帧数更多者,兼容 DFT 与 MLFF-run 输出格式;跳过步数越界时自动改用后半段。</li>
+  <li><span class="tag">可复现</span>工作目录自动保存 <code>mhec.yaml</code>,拟合时按其参数复现。</li>
+  <li><span class="tag">中英双语</span>菜单、提示、报告与日志支持中/英文界面(<code>MHEC_LANG</code> 或设置菜单切换,可永久保存),便于国际使用与投稿。</li>
+</ul>
+
+<h2>1.4 软件模块构成</h2>
+<p>软件由以下功能模块组成,各模块既可独立使用,也可串联为完整流程:</p>
+<table>
+  <tr><th>模块</th><th>对应菜单</th><th>职责</th></tr>
+  <tr><td>力场训练</td><td>7、8</td><td>定温/升温 MLFF 训练,应变增强,生成 ML_FF 与 ML_AB。</td></tr>
+  <tr><td>力场验证</td><td>9</td><td>ML_LOGFILE 精度分析、ML_AB parity 验证(E/F/应力)。</td></tr>
+  <tr><td>输入生成</td><td>1、3</td><td>识别晶系、生成 NPT/NVT 变形目录与 SLURM 一键提交脚本。</td></tr>
+  <tr><td>弹性拟合</td><td>2、4</td><td>提取应力、奇多项式拟合、对称化、Wallace 修正、Born 判据、出图。</td></tr>
+  <tr><td>力学后处理</td><td>5</td><td>VRH 模量、各向异性曲面、德拜温度、声速 + Origin 数据。</td></tr>
+  <tr><td>AIMD 后处理</td><td>6</td><td>RDF/MSD/VACF/PDOS、Green-Kubo 粘度、结构因子、压力统计。</td></tr>
+  <tr><td>辅助工具</td><td>10、11、12</td><td>晶系/空间群/密度、变形模式预览、平衡晶格与热膨胀。</td></tr>
+  <tr><td>全局配置</td><td>s</td><td>应变幅度、点数、温度等参数,持久化到 mhec.yaml。</td></tr>
+</table>
+
+<h2>1.5 典型工作流程</h2>
+<p>一个完整的高温弹性常数研究通常按如下顺序进行:</p>
+<pre><code>①  准备输入文件 (POSCAR / POTCAR / KPOINTS / INCAR / run.sh)
+        │
+②  MLFF 训练 (菜单 7 定温 或 8 升温)  ──►  得到 ML_FF / ML_AB
+        │
+③  力场精度验证 (菜单 9)  ──►  确认 energy / force / stress 精度达标
+        │
+④  生成弹性计算输入 (菜单 1 SC-SS 或 3 SA-SS,自动 ML_MODE=run)
+        │
+⑤  提交作业 (bash submit_all.sh):NPT 优化 → 更新结构 → NVT 采样
+        │
+⑥  拟合弹性常数 (菜单 2 或 4)  ──►  elastic.txt / 完整报告
+        │
+⑦  力学性质后处理 (菜单 5,可在拟合后自动进入)  ──►  模量/各向异性/德拜温度
+        │
+⑧  (可选) AIMD 后处理 (菜单 6) / 热膨胀 (菜单 12)</code></pre>
+<div class="note">若已有可靠力场,可直接从 ④ 开始;辅助工具(10/11)可在任意阶段用于核对结构与变形方案。</div>
+
+<h2>1.6 适用范围与限制</h2>
+<div class="warn">
+<strong>重要物理限制(经典分子动力学的固有局限):</strong>
+M-HEC 基于<strong>经典核</strong>的 MLFF-MD,不包含核量子效应。对于<strong>德拜温度极高的材料</strong>(如金刚石,θ<sub>D</sub>≈2000 K),
+在温度远低于 θ<sub>D</sub> 时,经典 MD 会高估热膨胀、并使弹性常数的<strong>温度依赖(dC/dT)在低温段失真</strong>。
+高温段(T ≳ θ<sub>D</sub>/2)结果更可靠。若需低温精确的温度依赖,建议改用准简谐近似(QHA)或路径积分 MD(PIMD)。
+详见第 11 章 FAQ。
+</div>
+<div class="page-break"></div>
+
+<!-- ============ 2 理论背景 ============ -->
+<h1>2 理论背景</h1>
+
+<h2>2.1 应力-应变法计算弹性常数</h2>
+<p>
+弹性常数 C<sub>ij</sub> 描述晶体应力 σ 对应变 ε 的线性响应,由广义胡克定律
+σ<sub>i</sub> = Σ<sub>j</sub> C<sub>ij</sub> ε<sub>j</sub>(Voigt 记法,i,j = 1…6)给出。
+M-HEC 对平衡结构施加一系列已知的小应变,在每个变形构型上用 MLFF-MD 采样得到时间平均应力,
+再对<strong>应力-应变曲线在零应变处求斜率</strong>,即得到相应的弹性常数分量。
+</p>
+<p>有限温度下,弹性常数取自 NVT 系综中变形结构的平均应力,因此天然包含温度效应(热软化)。</p>
+
+<h2>2.2 MLFF 加速的高温采样</h2>
+<p>
+纯 AIMD 在高温、大超胞、长时间采样下代价极高。M-HEC 借助 VASP 的机器学习力场:先用少量 DFT 步训练力场
+(<code>ML_MODE=train</code>),再用训练好的力场以接近经典 MD 的成本进行长时间采样(<code>ML_MODE=run</code>),
+在保持 DFT 精度的同时把采样成本降低若干数量级。
+</p>
+<div class="note">
+<strong>关键:训练域与采样域自洽。</strong> 弹性采样所用的应变幅度必须落在力场训练时见过的应变范围内,
+否则力场进入外推区、应力不可靠。M-HEC 默认弹性采样最大应变为 0.02(见 §2.4),与默认训练应变集
+(0.005 / 0.01 / 0.02)对齐。
+</div>
+
+<h2>2.3 SC-SS 与 SA-SS 两种变形方案</h2>
+<p>两者本质都是应力-应变法,区别在于施加应变的"基":</p>
+<table>
+  <tr><th>方案</th><th>全称</th><th>变形基</th><th>特点</th></tr>
+  <tr>
+    <td><strong>SC-SS</strong></td><td>单分量应力-应变法<br>(Single-Component)</td>
+    <td>逐个施加单一 Voigt 应变分量(如仅 ε<sub>1</sub>、仅 ε<sub>4</sub>)</td>
+    <td>通用,支持全部 9 个晶系;每个变形直接对应矩阵的一列。</td>
+  </tr>
+  <tr>
+    <td><strong>SA-SS</strong></td><td>对称化应力-应变法<br>(Symmetry-Adapted)</td>
+    <td>按晶系对称性组合的应变模式(如体积、正交、剪切等)</td>
+    <td>用更少的变形模式高效获取独立常数;每个模式对应某个 C<sub>ij</sub> 组合(如 C<sub>11</sub>+2C<sub>12</sub>、C<sub>11</sub>−C<sub>12</sub>、2C<sub>44</sub>)。</td>
+  </tr>
+</table>
+<p class="muted">软件内部与旧工作目录兼容,SA-SS 的配置键仍沿用 <code>vc</code>、文件前缀仍为 <code>vcfit_</code>。</p>
+
+<h2>2.4 奇多项式拟合与非谐偏置修正</h2>
+<p>
+有限温度下单轴应变的应力-应变曲线存在<strong>非谐性</strong>:若直接做线性拟合,曲线中的偶次(ε²)或高次项会
+系统性地偏置斜率(例如金刚石 C<sub>12</sub> 被显著高估)。M-HEC 默认使用
+<strong>过原点奇多项式拟合</strong> σ = C<sub>1</sub>·ε + C<sub>3</sub>·ε³,取一次项 C<sub>1</sub> 作为<strong>零应变切线斜率</strong>,
+从而消除非谐偏置。当数据点少于 4 个时自动退回线性拟合。该行为由参数 <code>fit_poly_order</code> 控制(默认 3;设为 1 则强制线性)。
+</p>
+<div class="note">
+由于采样点关于零点对称(±0.01、±0.02)且奇基函数与偶分量正交,偶次(压缩/拉伸不对称)项不会污染 C<sub>1</sub>,
+因此奇多项式拟合对体积/单轴等模式都稳健。
+</div>
+
+<h2>2.5 Wallace 残余压力修正</h2>
+<p>
+高温平衡构型往往存在残余静水压力 P。M-HEC 依据 Wallace 理论,把对称化后的 Birch 弹性常数
+修正为 Brugger 弹性常数(考虑残余压力贡献),并在报告中给出诊断。
+当 |P| 显著(> 0.5 GPa)时,<code>elastic.txt</code> 保存 Brugger 推荐值,同时另存 <code>elastic_birch.txt</code> 供参考。
+</p>
+
+<h2>2.6 力学性质与热力学量</h2>
+<p>由 6×6 弹性常数矩阵可进一步导出:</p>
+<ul>
+  <li><strong>VRH 多晶模量</strong>:体模量 K、剪切模量 G(Voigt/Reuss/Hill),及杨氏模量 E、泊松比 ν。</li>
+  <li><strong>各向异性</strong>:通用各向异性指数 A<sup>U</sup>、Zener 指数(立方)、K/G 各向异性。</li>
+  <li><strong>方向性性质</strong>:方向杨氏模量、剪切模量、泊松比、线压缩率的 2D/3D 各向异性曲面。</li>
+  <li><strong>热力学量</strong>:德拜温度 θ<sub>D</sub>、声速(纵/横及 Christoffel 方向声速)、最小热导率(Clarke 模型)。</li>
+  <li><strong>Born 稳定性</strong>:按晶系判据 + 正定性检验判断力学稳定性。</li>
+</ul>
+<div class="warn">
+德拜温度与声速依赖<strong>密度</strong>和<strong>每原子平均摩尔质量</strong>;M-HEC 会自动从工作目录的 POSCAR 推算并预填,
+请勿沿用无意义的默认值(如密度 5.0、摩尔质量 50.0),否则 θ<sub>D</sub>、声速会失真。
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============ 3 安装与运行环境 ============ -->
+<h1>3 安装与运行环境</h1>
+
+<h2>3.1 依赖环境</h2>
+<table>
+  <tr><th>类别</th><th>要求</th></tr>
+  <tr><td>操作系统</td><td>Linux(推荐,配合 SLURM 集群)/ Windows / macOS</td></tr>
+  <tr><td>Python</td><td>≥ 3.8</td></tr>
+  <tr><td>必需 Python 库</td><td><code>numpy</code>(≥1.18)、<code>scipy</code>(≥1.4)、<code>pandas</code>(≥1.0)</td></tr>
+  <tr><td>绘图(可选)</td><td><code>matplotlib</code>(≥3.0),用于拟合图、力学性质曲面、AIMD 图</td></tr>
+  <tr><td>空间群(可选)</td><td><code>spglib</code>,用于菜单 10 显示空间群</td></tr>
+  <tr><td>配置文件(可选)</td><td><code>pyyaml</code>,用于读取 YAML 配置</td></tr>
+  <tr><td>DFT/MD 引擎</td><td>VASP 6.x(需支持机器学习力场 ML_LMLFF)</td></tr>
+  <tr><td>作业调度</td><td>SLURM(用于一键提交脚本)</td></tr>
+</table>
+
+<h2>3.2 安装步骤</h2>
+<p><strong>方式一:安装发布的 wheel 包(推荐给最终用户)。</strong> 将 <code>mhec-1.0.0-py3-none-any.whl</code> 拷贝到目标机后:</p>
+<pre><code># 基础安装
+pip install mhec-1.0.0-py3-none-any.whl
+
+# 含绘图功能(推荐)
+pip install "mhec-1.0.0-py3-none-any.whl[plot]"
+
+# 可选:空间群识别
+pip install spglib
+</code></pre>
+<p>集群上更新(覆盖重装,不动依赖):</p>
+<pre><code>pip install --force-reinstall --no-deps mhec-1.0.0-py3-none-any.whl
+</code></pre>
+
+<p><strong>方式二:源码可编辑安装(推荐给开发者/需要改动源码者)。</strong>
+可编辑安装需要一份<strong>已展开的源码目录</strong>。若手上是源码包 <code>mhec-1.0.0.tar.gz</code>,先解压再进入目录以"可编辑(editable)"模式安装——此后修改源码<strong>即时生效、无需重装</strong>:</p>
+<pre><code># 解压源码包(仅可编辑安装 / 查看 examples、doc 时需要)
+tar -zxvf mhec-1.0.0.tar.gz
+cd mhec-1.0.0            # 进入含 pyproject.toml 的源码根目录
+
+# 可编辑安装
+pip3 install -e .
+
+# 含绘图等可选依赖
+pip3 install -e ".[plot]"
+</code></pre>
+<div class="note">
+普通安装<strong>无需手动解压</strong>:<code>pip install mhec-1.0.0.tar.gz</code> 或 <code>pip install *.whl</code> 会自动解压并构建。
+只有"可编辑安装(<code>-e</code>)"或需要查看 <code>examples/</code>、<code>doc/</code> 时才需要先 <code>tar -zxvf</code> 展开源码。
+可编辑安装会把源码目录直接链接到 Python 环境,适合边开发边测试;发布/部署到集群则用方式一的 wheel 包。
+</div>
+
+<h2>3.3 启动与卸载</h2>
+<pre><code># 启动交互式界面
+mhec
+
+# 查看版本
+mhec --version
+
+# 卸载
+pip uninstall mhec
+</code></pre>
+<p>启动后<strong>每屏顶部</strong>都会显示 M-HEC LOGO 横幅(版本、开发者、邮箱)+ 当前体系状态,随后是主菜单。若终端不支持颜色,可设置环境变量 <code>NO_COLOR=1</code>。</p>
+
+<h2>3.4 界面语言(中 / 英双语)</h2>
+<p>M-HEC 支持<strong>中文 / 英文</strong>双语界面(菜单、提示、报告、日志),默认中文。图内文字与数据文件恒为英文。三种切换方式:</p>
+<table>
+  <tr><th>方式</th><th>做法</th><th>生效范围</th></tr>
+  <tr>
+    <td>环境变量(推荐,尤其集群)</td>
+    <td>Linux/macOS:<code>export MHEC_LANG=en</code>(可写入 <code>~/.bashrc</code> 永久生效)<br>Windows:<code>setx MHEC_LANG en</code></td>
+    <td>永久 / 会话级,可临时覆盖偏好</td>
+  </tr>
+  <tr>
+    <td>软件内置(选一次永久记住)</td>
+    <td>主菜单输入 <code>s</code> → “界面语言 / Language (zh / en)” 输入 <code>en</code></td>
+    <td>写入用户偏好文件 <code>~/.mhec/lang</code>,下次启动自动生效</td>
+  </tr>
+  <tr>
+    <td>临时(单次会话)</td>
+    <td>同上在设置里改,或运行前设 <code>MHEC_LANG</code></td>
+    <td>当前进程</td>
+  </tr>
+</table>
+<div class="note">
+语言优先级:<strong>环境变量 <code>MHEC_LANG</code> &gt; 用户偏好文件 <code>~/.mhec/lang</code> &gt; 默认中文</strong>。
+改回中文:设置里选 <code>zh</code>,或 <code>export MHEC_LANG=zh</code>。投 SCI 论文/给国际用户使用时,建议全程英文(<code>MHEC_LANG=en</code>)。
+</div>
+<pre><code># 一次性永久切英文(Linux)
+echo 'export MHEC_LANG=en' &gt;&gt; ~/.bashrc &amp;&amp; source ~/.bashrc
+mhec        # 之后每次都是英文界面
+</code></pre>
+<div class="page-break"></div>
+
+<!-- ============ 4 快速开始 ============ -->
+<h1>4 快速开始(金刚石完整算例)</h1>
+<p>本章以金刚石为例,演示从力场到高温弹性常数的完整流程。假设已有一个训练好的力场 <code>ML_FF</code>。</p>
+
+<h3>步骤 0:准备输入文件</h3>
+<p>在一个工作目录中准备以下文件(见第 6 章):</p>
+<pre><code>POSCAR    POTCAR    KPOINTS    INCAR    ML_FF    run.sh</code></pre>
+
+<h3>步骤 1:生成弹性常数计算输入(菜单 1)</h3>
+<pre><code>$ mhec
+请输入功能编号: 1        # SC-SS 生成计算输入
+# 按提示确认晶系(自动识别:立方)、温度、应变幅度、NSW
+# 检测到 ML_FF → 自动对 NPT/NVT 强制 ML_MODE=run
+# 生成 mhec_work/ 目录与 submit_all.sh
+</code></pre>
+
+<h3>步骤 2:提交计算(集群)</h3>
+<pre><code>$ cd mhec_work
+$ bash submit_all.sh        # 或 sbatch submit_all.sh
+# Phase 1: NPT 晶格优化 → Phase 2: NVT 弹性常数采样(自动依赖)
+</code></pre>
+
+<h3>步骤 3:拟合弹性常数(菜单 2)</h3>
+<pre><code>$ mhec
+请输入功能编号: 2
+工作目录: mhec_work/phase2_nvt/300K
+# 自动读取 mhec.yaml、提取应力、奇多项式拟合、对称化、Wallace 修正
+# 输出 elastic.txt / elastic_constants.txt,并询问是否立即做力学性质分析
+是否立即进行力学性质分析? (y/n) [y]: y
+</code></pre>
+
+<h3>步骤 4:力学性质后处理(自动或菜单 5)</h3>
+<p>软件自动读取 POSCAR 预填密度与每原子摩尔质量,生成 VRH 模量、各向异性曲面(3D/2D)与 Origin 数据到 <code>elasticpost/</code>。</p>
+
+<div class="note">
+金刚石 300 K 参考结果(Brugger 修正后):C<sub>11</sub>≈1042、C<sub>12</sub>≈124、C<sub>44</sub>≈547 GPa,Born 稳定 ✓。
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============ 5 主菜单总览 ============ -->
+<h1>5 主菜单总览</h1>
+<p>启动 <code>mhec</code> 后进入单层主菜单,输入编号执行对应功能:</p>
+<div class="term">
+  <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> &nbsp;mhec — 主界面</div>
+<pre>   <span class="h">███╗   ███╗ ██╗  ██╗ ███████╗  ██████╗</span>
+   <span class="h">████╗ ████║ ██║  ██║ ██╔════╝ ██╔════╝</span>
+   <span class="h">██╔████╔██║ ████████║ █████╗   ██║</span>
+   <span class="h">██║╚██╔╝██║ ██╔══██║ ██╔══╝   ██║</span>
+   <span class="h">██║ ╚═╝ ██║ ██║  ██║ ███████╗  ██████╗</span>
+   MLFF-Enhanced High-Temperature Elastic Constants
+   Version 1.0   ·   Dr. Feng Xing   ·   fengxing@amgm.ac.cn
+ ────────────────────────────────────────────────────────────
+   当前体系: C8 (8 atoms)      晶系: 立方
+   计算温度: [300] K           应变设置: 5点 (±2δ, δ=0.01)
+ ────────────────────────────────────────────────────────────
+   <span class="h">弹性常数计算</span>
+    1) SC-SS 单分量应力-应变法 · 生成计算输入
+    2) SC-SS 单分量应力-应变法 · 拟合弹性常数
+    3) SA-SS 对称化应力-应变法 · 生成计算输入
+    4) SA-SS 对称化应力-应变法 · 拟合弹性常数
+   <span class="h">后处理分析</span>
+    5) 力学性质后处理      6) AIMD 后处理
+   <span class="h">机器学习力场</span>
+    7) MLFF 训练 (定温)   8) MLFF 训练 (升温)   9) MLFF 精度验证
+   <span class="h">辅助工具</span>
+   10) 晶系识别与晶格参数  11) 变形模式与应变方案  12) 平衡晶格与热膨胀系数
+ ────────────────────────────────────────────────────────────
+    s) 修改设置            0) 退出
+ <span class="p">请输入功能编号:</span> <span class="i">_</span></pre>
+</div>
+
+<table>
+  <tr><th>分区</th><th>编号</th><th>功能</th><th>说明</th></tr>
+  <tr><td rowspan="4">弹性常数计算</td><td>1</td><td>SC-SS · 生成计算输入</td><td>单分量法,生成 NPT/NVT 目录与提交脚本</td></tr>
+  <tr><td>2</td><td>SC-SS · 拟合弹性常数</td><td>提取应力 → 拟合 → 对称化 → 修正 → 报告</td></tr>
+  <tr><td>3</td><td>SA-SS · 生成计算输入</td><td>对称化法(变形模式更少)</td></tr>
+  <tr><td>4</td><td>SA-SS · 拟合弹性常数</td><td>同 2,针对对称化变形模式</td></tr>
+  <tr><td rowspan="2">后处理分析</td><td>5</td><td>力学性质后处理</td><td>VRH、各向异性曲面、德拜温度、声速 + Origin 数据</td></tr>
+  <tr><td>6</td><td>AIMD 后处理</td><td>RDF/MSD/VACF/PDOS/Green-Kubo 粘度等</td></tr>
+  <tr><td rowspan="3">机器学习力场</td><td>7</td><td>MLFF 训练(定温)</td><td>多温度网格 + 应变增强训练</td></tr>
+  <tr><td>8</td><td>MLFF 训练(升温)</td><td>一条升温轨迹覆盖温区 + 各应变续训</td></tr>
+  <tr><td>9</td><td>MLFF 精度验证</td><td>ML_LOGFILE 分析 / ML_AB parity 验证</td></tr>
+  <tr><td rowspan="3">辅助工具</td><td>10</td><td>晶系识别与晶格参数</td><td>晶格参数、化学式、摩尔质量、密度、空间群</td></tr>
+  <tr><td>11</td><td>变形模式与应变方案</td><td>查看 SC-SS/SA-SS 变形集与幅度点</td></tr>
+  <tr><td>12</td><td>平衡晶格与热膨胀系数</td><td>从 NPT 提取平衡晶格并算热膨胀</td></tr>
+  <tr><td rowspan="2">其他</td><td>s</td><td>修改设置</td><td>调整应变幅度、点数、温度等全局参数</td></tr>
+  <tr><td>0</td><td>退出</td><td>结束程序</td></tr>
+</table>
+<div class="note">典型使用顺序:<strong>7/8(训练力场)→ 9(验证力场)→ 1 或 3(生成)→ 提交 → 2 或 4(拟合)→ 5(力学后处理)</strong>。</div>
+<div class="page-break"></div>
+
+<!-- ============ 6 输入文件准备 ============ -->
+<h1>6 输入文件准备</h1>
+<p>弹性常数完整工作流(菜单 1/3)要求在当前目录准备下列文件:</p>
+<table>
+  <tr><th>文件</th><th>必需</th><th>说明</th></tr>
+  <tr><td><code>POSCAR</code></td><td>是</td><td>平衡结构;<strong>务必包含元素符号行</strong>(第 6 行),否则无法算密度/摩尔质量。</td></tr>
+  <tr><td><code>INCAR</code></td><td>是</td><td>用户提供的 VASP 参数模板;M-HEC 继承其物理参数,仅强制改写会破坏 MD/ML 流程的控制参数。</td></tr>
+  <tr><td><code>POTCAR</code></td><td>推荐</td><td>赝势文件,自动复制到各计算目录。</td></tr>
+  <tr><td><code>KPOINTS</code></td><td>推荐</td><td>k 点文件,自动复制。</td></tr>
+  <tr><td><code>ML_FF</code></td><td>推荐</td><td>预训练力场;存在时弹性计算自动强制 <code>ML_MODE=run</code>。</td></tr>
+  <tr><td><code>run.sh</code></td><td>推荐</td><td>SLURM 作业脚本,自动复制到各目录,由 submit_all.sh 调度。</td></tr>
+</table>
+
+<h3>INCAR 参数继承规则</h3>
+<p>
+M-HEC 会读取用户 INCAR,把<strong>除受管控制参数以外的所有键(如 ENCUT、PREC、EDIFF、ALGO、LREAL、ISMEAR、SIGMA、
+GGA、IVDW/VDW_*、LDAU*、ISPIN、MAGMOM 等)全部继承</strong>,以适配不同体系(金属/绝缘体/含 D3 校正等)。
+只有会破坏工作流的参数被强制改写:
+</p>
+<pre><code>受管(强制)参数:IBRION / MDALGO / ISIF / NSW / TEBEG / TEEND / POTIM /
+                 SMASS / PMASS / PSTRESS / LANGEVIN_GAMMA(_L) / ISYM / LWAVE / LCHARG,
+                 以及全部 ML_* 前缀参数</code></pre>
+<div class="note">
+<code>LANGEVIN_GAMMA</code> 会按<strong>元素种类数量自动展开</strong>(每元素一个值);若用户给的值个数不足,按最后一个值补齐。
+</div>
+<div class="danger">
+<strong>务必用同一已训练力场计算所有变形。</strong> 弹性常数要求各变形目录使用<strong>相同</strong>的力场(<code>ML_MODE=run</code>)。
+若目录里各自 <code>ML_MODE=train</code> 在线训练,会得到互不一致的力场,弹性常数将失去物理意义。检测到 <code>ML_FF</code> 时软件自动处理;
+未检测到会给出警告。
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============ 7 功能详解 ============ -->
+<h1>7 功能详解</h1>
+<div class="note">
+本章的<strong>终端画面</strong>为软件真实控制台输出;<strong>图片</strong>为 M-HEC 对金刚石算例真实运行生成的结果图
+(拟合诊断图、各向异性曲面、parity 图等)。具体数值随体系、力场与采样设置而变化。
+</div>
+
+<h2>7.1 弹性常数计算(菜单 1–4)</h2>
+
+<h3>菜单 1 / 3:生成计算输入</h3>
+<p><strong>作用</strong>:识别晶系、确认参数,生成两阶段计算目录与一键提交脚本。</p>
+<div class="term">
+  <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> &nbsp;mhec — 生成弹性常数计算输入</div>
+<pre><span class="p">请输入功能编号:</span> <span class="i">1</span>
+ <span class="h">-->> 完整工作流向导 — SC-SS 单分量应力-应变法</span>
+ ────────────────────────────────────────────────────────────
+   请确认当前目录下的输入文件:
+     ✓ POSCAR   ✓ POTCAR   ✓ KPOINTS   ✓ INCAR   ✓ ML_FF   ✓ run.sh
+   +-> 已读取 POSCAR
+   +-> 已读取 INCAR (36 个参数)
+ 晶系选择 (自动识别: 立方):
+   8) 立方  ( 3 个独立常数) ◀ 自动识别
+ 选择晶系编号 (直接回车确认自动识别) []:
+   +-> 晶系: 立方 (3 个独立弹性常数)
+   --> SC-SS 变形模式数: 2
+ 温度 (K, 多个用空格分隔) [300]: <span class="i">300</span>
+ 应变幅度 δ [0.01]:
+ NPT NSW (晶格优化步数) [30000]: <span class="i">100000</span>
+ NVT NSW (弹性常数采样步数) [30000]: <span class="i">100000</span>
+ 确认并生成? (y/n) [y]: <span class="i">y</span>
+ 工作目录 [mhec_work]:
+   --> 检测到 ML_FF → NPT/NVT 强制 ML_MODE=run (ML_ISTART=2), 剔除训练参数
+   +-> POTCAR / KPOINTS / ML_FF / run.sh 已复制到 14 个目录
+   +-> mhec_work/submit_all.sh
+   <span class="p">+-> 工作目录: /.../mhec_work</span>
+   --> 一键提交所有任务:  bash mhec_work/submit_all.sh</pre>
+</div>
+<p><strong>产物</strong>:</p>
+<pre><code>mhec_work/
+├── phase1_npt/npt_&lt;T&gt;K/            # 各温度 NPT 晶格优化
+├── phase2_nvt/&lt;T&gt;K/
+│   ├── equilibrium/                # 平衡构型(参考应力)
+│   └── &lt;变形&gt;_&lt;幅度&gt;/               # 各变形×各幅度
+├── submit_all.sh                   # 一键提交(Phase1→更新结构→Phase2)
+└── mhec.yaml                       # 保存的参数(供拟合复现)</code></pre>
+<div class="note">SC-SS(菜单 1)与 SA-SS(菜单 3)共用同一生成向导,差别仅在变形集。SA-SS 目前支持对称性较高的晶系。</div>
+
+<h3>菜单 2 / 4:拟合弹性常数</h3>
+<p><strong>作用</strong>:提取各变形目录的时间平均应力,拟合并输出弹性常数。</p>
+<div class="term">
+  <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> &nbsp;mhec — 拟合弹性常数</div>
+<pre><span class="p">请输入功能编号:</span> <span class="i">2</span>
+ <span class="h">-->> SC-SS 单分量应力-应变法 · 弹性常数拟合</span>
+ 工作目录 [.]: <span class="i">mhec_work/phase2_nvt/300K</span>
+   +-> 已加载工作目录配置: δ=0.01, n_points=5, method=standard
+ 读取应力数据 |████████████████████████████| 100.0% 完成
+ 原始弹性常数矩阵 (GPa)
+   1042.40   123.48   123.69   ...
+ 对称性修正后弹性常数矩阵 (Birch, GPa)
+   1042.40   123.59   123.59   ...
+ 残余压力诊断 (Wallace 修正):  P = -0.741 GPa
+ Wallace 修正后弹性常数矩阵 (Brugger, 推荐值, GPa)
+   1041.66   124.33   124.33   ...
+   <span class="p">+-> Born 稳定性: 满足 ✓</span>
+   +-> elastic_constants.txt (完整报告)
+   +-> elastic.txt (Brugger, Wallace 修正后 6×6 矩阵)
+ 是否立即进行力学性质分析? (y/n) [y]: <span class="i">y</span></pre>
+</div>
+<p>拟合诊断图(SA-SS 对称化模式示例,SC-SS 生成同类 <code>fit_*.png</code>):每条曲线标注对应的 C<sub>ij</sub> 组合与斜率、R²。</p>
+<figure class="shot wide"><img src="manual_img/fit_hydro.png" alt="hydro 拟合"><figcaption>体积模式 hydro:三个法向分量的应力-应变拟合,斜率 = C₁₁+2C₁₂</figcaption></figure>
+<figure class="shot wide"><img src="manual_img/fit_shear.png" alt="shear 拟合"><figcaption>剪切模式 shear_yz:斜率 = 2·C₄₄</figcaption></figure>
+<figure class="shot small"><img src="manual_img/fit_r2heatmap.png" alt="R2 热图"><figcaption>各模式 × 6 分量的 R² 热图(对称性零项标灰,不参与判定)</figcaption></figure>
+<p class="muted">拟合诊断图只显示对称性允许的非零分量;R² 热图对零项标灰;Origin 数据列名按 C<sub>ij</sub> 命名。</p>
+
+
+<h2>7.2 后处理分析(菜单 5–6)</h2>
+
+<h3>菜单 5:力学性质后处理</h3>
+<p><strong>输入</strong>:弹性矩阵文件(默认 <code>elastic.txt</code>)、输出目录、密度、每原子摩尔质量(均自动从邻近 POSCAR 预填)。</p>
+<p><strong>产物</strong>(<code>elasticpost/</code> 目录):</p>
+<ul>
+  <li>VRH 模量、各向异性指数、Born 稳定性文本报告;</li>
+  <li>E / G / ν / 线压缩率 / 体模量的 <strong>3D 各向异性曲面图</strong>与 <strong>2D 截面极图</strong>(xy/xz/yz);</li>
+  <li>德拜温度、纵/横声速、Christoffel 方向声速、最小热导率;</li>
+  <li>所有图对应的 <strong>Origin 可直接读取的 .txt / .dat 数据</strong>。</li>
+</ul>
+<div class="grid3">
+  <figure class="shot"><img src="manual_img/E_3D_surface.png" alt="E 3D"><figcaption>杨氏模量 E 的 3D 各向异性曲面</figcaption></figure>
+  <figure class="shot"><img src="manual_img/G_3D_surface.png" alt="G 3D"><figcaption>剪切模量 G 的 3D 曲面</figcaption></figure>
+  <figure class="shot"><img src="manual_img/nu_3D_surface.png" alt="nu 3D"><figcaption>泊松比 ν 的 3D 曲面</figcaption></figure>
+</div>
+<figure class="shot small"><img src="manual_img/E_2D_xy.png" alt="E 2D xy"><figcaption>杨氏模量在 xy 截面的 2D 极图(另有 xz / yz 截面)</figcaption></figure>
+
+<h3>菜单 6:AIMD 后处理</h3>
+<p><strong>作用</strong>:对某个 MD 轨迹目录做结构与输运分析。</p>
+<div class="term">
+  <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> &nbsp;mhec — AIMD 后处理</div>
+<pre><span class="p">请输入功能编号:</span> <span class="i">6</span>
+ <span class="h">-->> AIMD 后处理 (完整分析)</span>
+ 计算目录路径 [.]: <span class="i">mhec_work/phase2_nvt/300K/equilibrium</span>
+ 温度 (K) [300]:      POTIM (fs) [1.0]:      块平均块数 [5]:
+ 丢弃初始比例 [0.3]:  有效粒子半径 (Å, 留空自动) []:
+   Calculated density: 3.5154 g/cm³
+   --- Computing Green-Kubo Viscosity ---
+   Green-Kubo Viscosity (Bootstrap 95% CI): 2.13e-03 Pa*s [1.9e-03, 2.4e-03]
+   --- Computing Hydrostatic Pressure Statistics ---
+   Mean Pressure: -0.12 ± 3.45 GPa
+   <span class="p">+-> 输出文件前缀: aimd_postproc_equilibrium_run</span>
+   [OK] RDF / MSD / VACF / PDOS / 结构因子 / 压力统计 图与 .dat 已保存</pre>
+</div>
+<p><strong>产物</strong>:RDF/偏 RDF、MSD 与扩散系数(可分元素)、VACF 与声子态密度 PDOS、Green-Kubo 粘度(块平均 + Bootstrap 置信区间)、结构因子 S(q)、配位数、键长键角分布、静水压力统计等,均输出图与 Origin 数据。</p>
+<div class="note">密度由 POSCAR 组成自动计算(仅作信息输出);AIMD 的物理量(扩散、粘度、RDF)不需要用户输入密度或摩尔质量。</div>
+
+<div class="page-break"></div>
+
+<h2>7.3 机器学习力场(菜单 7–9)</h2>
+
+<h3>菜单 7:MLFF 训练(定温)</h3>
+<p><strong>作用</strong>:在多个温度点上训练力场,并注入弹性应变构型以覆盖弹性线性区。</p>
+<p><strong>要点</strong>:</p>
+<ul>
+  <li>读取用户 INCAR,继承物理参数(GGA、D3、ISMEAR 等),仅强制 MD/ML 控制参数;</li>
+  <li>默认训练应变集 <code>[0.005, 0.01, 0.02]</code>,与弹性采样最大应变 0.02 对齐;</li>
+  <li>NPT 分支的 <code>LANGEVIN_GAMMA</code> 按元素数展开。</li>
+</ul>
+<p><strong>弹性训练模式(auto / general)</strong>——决定 Phase B 训练时施加哪些应变方向:</p>
+<table>
+  <tr><th>模式</th><th>施加的应变集</th><th>适用</th></tr>
+  <tr><td><strong>auto</strong>(默认)</td><td>按当前晶系对称性给出的<strong>最小充分应变集</strong>(如立方 4 个、六方/四方 7–8 个、正交 10 个)</td><td>推荐,既充分又不浪费</td></tr>
+  <tr><td><strong>general</strong></td><td>不裁剪的<strong>全 Voigt 基</strong>(xx/yy/zz 单轴 ±、yz/xz/xy 剪切 ±、体积 ±,共 14 个)</td><td>不信任自动识别、或担心高温对称性破缺时的保险选项;代价是目录/计算量更大</td></tr>
+</table>
+<div class="note">对给定晶系,<code>auto</code> 已足以覆盖全部独立弹性常数;<code>general</code> 的额外方向属冗余采样,不会提升该晶系结果精度,只是更保险。</div>
+
+<h3>菜单 8:MLFF 训练(升温)</h3>
+<p><strong>作用</strong>:用一条升温 NPT 轨迹覆盖整个温区(含热膨胀),再在该力场基础上对各应变方向做升温续训(严格顺序续训)。应变集按晶系对称性自适应。</p>
+<div class="term">
+  <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> &nbsp;mhec — MLFF 训练</div>
+<pre><span class="p">请输入功能编号:</span> <span class="i">8</span>
+ <span class="h">-->> MLFF 升温训练</span>
+   识别晶系: 立方
+ 起始温度 (K) [300]:   结束温度 (K) [1500]:
+ 应变幅度 (空格分隔) [0.01 0.02]:
+ 弹性训练模式 (auto / general) [auto]: <span class="i">auto</span>
+ 每段升温 MD 步数 [30000]: <span class="i">50000</span>
+ 训练工作目录 [mlff_train_ramp]:
+   +-> A_ramp_npt         (升温 NPT 主轨迹)
+   +-> B_uniax_xx_e0.010  B_uniax_xx_e0.020  B_shear_yz_e0.010 ...
+   +-> refit_final        submit_train.sh
+   <span class="p">+-> 全程严格顺序续训 (ML_ISTART=1),完成后得到 ML_FF / ML_AB</span></pre>
+</div>
+
+
+<h3>菜单 9:MLFF 精度验证</h3>
+<p>三个子功能:</p>
+<table>
+  <tr><th>选项</th><th>功能</th><th>说明</th></tr>
+  <tr><td>1</td><td>分析 ML_LOGFILE</td><td>解析单个 ML_LOGFILE,报告训练集 RMSE(ERR)、贝叶斯误差(BEEF)、精度评级与建议。</td></tr>
+  <tr><td>2</td><td>生成 ML_AB 评估目录</td><td>以 ML_AB 存储的 DFT 参考为基准,对每个训练构型用 ML_FF 重新预测(ML_MODE=run)。</td></tr>
+  <tr><td>3</td><td>收集 ML_AB 评估结果</td><td>汇总生成能量/力/应力的 parity 图与统计报告(RMSE/MAE/R²)。</td></tr>
+</table>
+<div class="note">
+<strong>stress 精度尤为关键</strong>:弹性常数直接来自应力,应先确认 stress parity 的 RMSE 足够小,再信任 C<sub>ij</sub>。
+</div>
+<div class="term">
+  <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> &nbsp;mhec — MLFF 精度验证</div>
+<pre><span class="p">请输入功能编号:</span> <span class="i">9</span>
+ <span class="h">-->> MLFF 力场精度验证</span>
+   1) 分析 ML_LOGFILE
+   2) 生成 ML_AB 评估目录
+   3) 收集 ML_AB 评估结果
+ 选择 [1]: <span class="i">3</span>
+   成功配对 512 帧
+     物理量        RMSE          MAE        R²        N   单位
+     能量        0.0021       0.0016    0.9998     512   eV/atom
+     力          0.0453       0.0331    0.9991   ...     eV/Å
+     应力        0.62         0.48      0.9975   ...     kBar
+   <span class="p">+-> energy_parity.svg / force_parity.svg / stress_parity.svg</span></pre>
+</div>
+<div class="grid2">
+  <figure class="shot"><img src="manual_img/parity_plots.png" alt="parity 总图"><figcaption>能量/力/应力 parity(DFT 参考 vs MLFF 预测)</figcaption></figure>
+  <figure class="shot"><img src="manual_img/stress_parity.png" alt="stress parity"><figcaption>应力 parity 单图(弹性常数精度的关键指标)</figcaption></figure>
+</div>
+
+
+<h2>7.4 辅助工具(菜单 10–12)</h2>
+
+<h3>菜单 10:晶系识别与晶格参数</h3>
+<p>读取 POSCAR,输出:</p>
+<ul>
+  <li>晶格矢量与参数(a,b,c,α,β,γ)、体积 V;</li>
+  <li><strong>原子组成、化学式(含化学式单元数 Z)、摩尔质量(每化学式单元/每晶胞/每原子平均)、密度(g/cm³)</strong>;</li>
+  <li>晶系与独立弹性常数数目;</li>
+  <li><strong>空间群</strong>(需安装 spglib,否则跳过并提示)。</li>
+</ul>
+<div class="term">
+  <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> &nbsp;mhec — 晶系识别与晶格参数</div>
+<pre><span class="p">请输入功能编号:</span> <span class="i">10</span>
+ <span class="h">-->> 晶系识别与晶格参数</span>
+ POSCAR 文件路径 [POSCAR]:
+   +-> 已读取: POSCAR
+   晶格参数:
+     a = 3.567000 Å    α = 90.0000°
+     b = 3.567000 Å    β = 90.0000°
+     c = 3.567000 Å    γ = 90.0000°
+     V = 45.3826 ų
+   组成与物性:
+     原子组成: C8  (共 8 原子)
+     化学式:   C1  (Z = 8)
+     摩尔质量: 12.011 g/mol (每化学式单元)
+               96.088 g/mol (每晶胞) / 12.011 g/mol (每原子平均)
+     密度:     3.515 g/cm³
+   +-> 晶系: 立方 (3 个独立弹性常数)
+   <span class="p">+-> 空间群: Fd-3m (227)</span></pre>
+</div>
+
+
+<h3>菜单 11:变形模式与应变方案</h3>
+<p>展示当前晶系下 SC-SS 与 SA-SS 的变形集、每个变形对应的非零应变分量、幅度点(±nδ)与总计算数,便于提交前核对。</p>
+<div class="term">
+  <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> &nbsp;mhec — 变形模式与应变方案</div>
+<pre><span class="p">请输入功能编号:</span> <span class="i">11</span>
+ <span class="h">-->> 查看变形模式</span>
+   SC-SS 单分量应力-应变法 变形模式
+     deform100000  →  ε1=+0.0100
+     deform000100  →  ε4=+0.0100
+   幅度点 (δ = 0.01):
+     n2:-2δ=-0.0200  n1:-1δ=-0.0100  p1:+1δ=+0.0100  p2:+2δ=+0.0200
+   SA-SS 对称化应力-应变法 变形模式
+     hydro     → C11+2C12
+     ortho     → C11-C12
+     shear_yz  → 2·C44
+   共 3 个变形模式 × 4 幅度点</pre>
+</div>
+
+<h3>菜单 12:平衡晶格与热膨胀系数</h3>
+<p>从各温度 NPT 计算中提取平衡晶格常数(对称性约束 + 时间平均),拟合晶格常数随温度变化,输出线膨胀系数与体膨胀系数及 Origin 数据。</p>
+<div class="term">
+  <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> &nbsp;mhec — 平衡晶格与热膨胀</div>
+<pre><span class="p">请输入功能编号:</span> <span class="i">12</span>
+ <span class="h">-->> 提取平衡晶格 + 热膨胀系数</span>
+ NPT 工作目录 [npt_opt]:
+   T(K)     a(Å)       α_linear(1/K)     β_volume(1/K)
+   300      3.5674     1.02e-06          3.06e-06
+   700      3.5698     ...               ...
+   1500     3.5765     ...               ...
+   <span class="p">+-> 线/体膨胀系数与 Origin 数据已保存</span></pre>
+</div>
+<div class="warn">对高德拜温度材料(如金刚石),经典 MD 的低温热膨胀会被高估,请参考第 11 章的物理说明。</div>
+
+
+<h2>7.5 全局设置(s)</h2>
+<p>在主菜单输入 <span class="kbd">s</span> 进入设置,可调整应变点数等参数。常用可配置项见第 9 章。修改后在生成计算时写入工作目录 <code>mhec.yaml</code>。</p>
+<div class="page-break"></div>
+
+<!-- ============ 8 输出文件说明 ============ -->
+<h1>8 输出文件说明</h1>
+<table>
+  <tr><th>文件 / 目录</th><th>产生功能</th><th>内容</th></tr>
+  <tr><td><code>elastic.txt</code></td><td>菜单 2/4</td><td>推荐弹性常数 6×6 矩阵(|P|&gt;0.5 GPa 为 Brugger,否则 Birch),纯数值,可 <code>np.loadtxt</code> 直接读。</td></tr>
+  <tr><td><code>elastic_constants.txt</code></td><td>菜单 2/4</td><td>完整报告:原始矩阵、对称化矩阵、Wallace 诊断、Brugger 矩阵、Born 稳定性、拟合统计。</td></tr>
+  <tr><td><code>elastic_birch.txt</code></td><td>菜单 2/4</td><td>未做压力修正的 Birch 矩阵(仅供参考,|P| 显著时生成)。</td></tr>
+  <tr><td><code>fit_*.png</code> / <code>fit_*_data.dat</code> / <code>fit_*_GPa.dat</code></td><td>菜单 2</td><td>各变形的应力-应变拟合诊断图与 Origin 数据(仅非零分量,列名按 C<sub>ij</sub> 命名)。</td></tr>
+  <tr><td><code>vcfit_*.png</code> / <code>vcfit_*_*.dat</code></td><td>菜单 4</td><td>SA-SS 各模式的拟合图与数据(前缀 <code>vcfit_</code> 兼容旧目录)。</td></tr>
+  <tr><td><code>fit_r2_heatmap.png</code></td><td>菜单 2/4</td><td>各变形 × 6 分量的 R² 热图(对称性零项标灰)。</td></tr>
+  <tr><td><code>elasticpost/</code></td><td>菜单 5</td><td>VRH 报告、3D/2D 各向异性曲面图(E/G/ν/β/B)、德拜温度/声速、及对应 Origin 数据。</td></tr>
+  <tr><td><code>*_summary_table.dat</code> 等</td><td>菜单 6</td><td>AIMD 后处理:RDF/MSD/VACF/PDOS/粘度/结构因子/压力统计等图与数据。</td></tr>
+  <tr><td><code>mhec.yaml</code></td><td>菜单 1/3</td><td>工作目录参数快照,拟合时自动读取以保证一致复现。</td></tr>
+</table>
+<div class="note">所有二维/三维数据文件均为 <strong>Tab 分隔、含表头</strong>,可在 Origin 中直接导入绘图。图内文字为英文(matplotlib 字体兼容集群环境)。</div>
+
+<div class="page-break"></div>
+
+<!-- ============ 9 参数参考 ============ -->
+<h1>9 参数参考与 mhec.yaml</h1>
+<p>核心可配置参数及默认值:</p>
+<table>
+  <tr><th>参数</th><th>默认值</th><th>含义</th></tr>
+  <tr><td><code>temperatures</code></td><td>[300]</td><td>计算温度列表(K),可多个。</td></tr>
+  <tr><td><code>magnitude</code>(δ)</td><td>0.01</td><td>基础应变幅度。</td></tr>
+  <tr><td><code>n_points</code></td><td>5</td><td>采样点数(3/5/7/9/11)。5 → ±0.01、±0.02,最大应变 0.02,与训练域对齐。</td></tr>
+  <tr><td><code>fit_poly_order</code></td><td>3</td><td>拟合阶数:3=过原点奇多项式(去非谐偏置,推荐);1=线性。</td></tr>
+  <tr><td><code>strain_method</code></td><td>standard</td><td>应变方案(standard / ulics)。</td></tr>
+  <tr><td><code>elastic_method</code></td><td>ss</td><td>ss=SC-SS;vc=SA-SS(内部键名)。</td></tr>
+  <tr><td><code>skip_steps</code></td><td>500</td><td>提取应力时跳过的初始步数(避开平衡段)。</td></tr>
+  <tr><td><code>nsw_train / nsw_refit / nsw_run</code></td><td>2000 / 10 / 10000</td><td>训练 / refit / run 阶段的 MD 步数默认。</td></tr>
+  <tr><td><code>potim</code></td><td>1.0</td><td>MD 时间步(fs)。</td></tr>
+  <tr><td><code>encut</code></td><td>None</td><td>平面波截断(None=沿用 INCAR/POTCAR)。</td></tr>
+  <tr><td><code>crystal_tol</code></td><td>0.01</td><td>晶系识别容差。</td></tr>
+  <tr><td><code>r2_threshold</code></td><td>0.95</td><td>拟合 R² 警告阈值。</td></tr>
+  <tr><td><code>crystal_system</code></td><td>None</td><td>手动指定晶系(覆盖自动识别)。</td></tr>
+  <tr><td><code>primitive_poscar</code></td><td>None</td><td>原胞路径,避免超胞误判晶系。</td></tr>
+</table>
+<p><code>mhec.yaml</code> 示例(节选):</p>
+<pre><code>temperatures: [300, 500, 700, 900, 1100, 1300, 1500]
+magnitude: 0.01
+n_points: 5
+fit_poly_order: 3
+elastic_method: ss
+skip_steps: 500
+vasp:
+  nsw_run: 100000
+  potim: 1.0
+crystal_system: cubic</code></pre>
+<div class="note">已有工作目录按其保存的 <code>mhec.yaml</code> 运行(兼容旧结果);要改用新默认(如 n_points=5)需修改该文件后重新生成。</div>
+
+<div class="page-break"></div>
+
+<!-- ============ 10 命令行批处理 ============ -->
+<h1>10 命令行批处理模式</h1>
+<p>除交互界面外,支持非交互式参数运行:</p>
+<table>
+  <tr><th>参数</th><th>说明</th></tr>
+  <tr><td><code>--version</code></td><td>显示版本号</td></tr>
+  <tr><td><code>--poscar PATH</code></td><td>POSCAR 路径</td></tr>
+  <tr><td><code>--primitive PATH</code></td><td>原胞 POSCAR 路径</td></tr>
+  <tr><td><code>--crystal-system NAME</code></td><td>手动指定晶系</td></tr>
+  <tr><td><code>--temp T [T ...]</code></td><td>温度(K)</td></tr>
+  <tr><td><code>--strain δ</code></td><td>应变幅度</td></tr>
+  <tr><td><code>--method {standard,ulics}</code></td><td>应变方案</td></tr>
+  <tr><td><code>--config PATH</code></td><td>配置文件(YAML/JSON)</td></tr>
+  <tr><td><code>--batch</code></td><td>批量模式</td></tr>
+</table>
+<pre><code># 示例
+mhec --poscar POSCAR --crystal-system cubic --temp 300 500 700 --strain 0.01 --batch
+mhec --config mhec.yaml --batch
+</code></pre>
+<div class="page-break"></div>
+
+<!-- ============ 11 FAQ ============ -->
+<h1>11 常见问题与注意事项(FAQ)</h1>
+
+<h3>Q1. 金刚石的热膨胀/低温弹性常数为什么和实验对不上?</h3>
+<p>
+经典 MD 不含核量子效应。金刚石德拜温度极高(≈2000 K),在 300–1500 K 远低于 θ<sub>D</sub>,量子效应显著。
+表现为:<strong>热膨胀在低温被严重高估</strong>(经典给出近乎常数的高温平台值);弹性常数的<strong>温度依赖(dC/dT)在低温段失真</strong>。
+好在弹性常数随温度变化本身很小(几个%),故 300 K 绝对值误差通常仅 1–2%。<strong>建议:高温段结果可信;
+要低温精确斜率请用 QHA 或 PIMD。</strong>
+</p>
+
+<h3>Q2. 如何保证不同温度的弹性常数正确?</h3>
+<ol>
+  <li><strong>0 K 静态对标</strong>:用同一力场在 0 K 静态结构上算弹性常数,与 DFT/实验对比(锚点)。</li>
+  <li><strong>MLFF 应力精度</strong>:确认变形构型上的 stress parity RMSE 足够小(菜单 9)。</li>
+  <li><strong>收敛性</strong>:应变幅度在线性区、采样步数足够、超胞与 k 点收敛。</li>
+  <li><strong>趋势自检</strong>:C<sub>ij</sub> 随 T 单调平滑软化;必要时 SC-SS 与 SA-SS 交叉验证。</li>
+  <li><strong>零压平衡</strong>:各温度 NPT 收敛到零压(Wallace 诊断 |P| 小)。</li>
+</ol>
+
+<h3>Q3. 拟合图里 0.02、0.03 点越来越偏,怎么办?</h3>
+<p>
+主因是 <strong>MLFF 外推</strong>(采样应变超出训练域)和<strong>有限应变非谐</strong>。对策:把弹性采样最大应变控制在训练域内
+(默认 <code>n_points=5</code> → 最大 0.02);必要时进一步减小 δ(如 0.008/0.006);保持奇多项式拟合以取零应变切线;
+或在 0.01/0.02 应变构型补训练数据。
+</p>
+
+<h3>Q4. C<sub>12</sub> 偏高?</h3>
+<p>单轴应变应力-应变曲线的非谐(奇次立方)项会偏置线性拟合。M-HEC 默认的奇多项式(立方)拟合已修正此问题;确保 <code>fit_poly_order=3</code>。</p>
+
+<h3>Q5. 应该用 PBE 还是 PBEsol / 是否加 D3?</h3>
+<p>
+PBEsol 对致密固体的晶格常数与弹性常数通常更好;D3 色散校正主要对层状/分子/范德华体系关键,共价/金属体系一般无需。
+泛函与 D3 参数请写在用户 INCAR 中,M-HEC 会自动继承。<strong>若之前训练力场时 INCAR 漏带泛函/D3,建议用新版重训力场。</strong>
+</p>
+
+<h3>Q6. 力学后处理里密度/摩尔质量该填什么?</h3>
+<p>软件会从工作目录 POSCAR 自动预填<strong>密度</strong>与<strong>每原子平均摩尔质量</strong>(德拜温度所需)。请勿沿用默认 5.0 / 50.0。POSCAR 必须含元素符号行。</p>
+
+<h3>Q7. VASP 报 MPI / 内存相关错误?</h3>
+<ul>
+  <li>单节点端口异常:设 <code>I_MPI_FABRICS=shm</code>;多节点用 <code>FI_PROVIDER=tcp</code> 或排除故障节点。</li>
+  <li>OOM(SIGKILL/SIGBUS):每节点减少 rank、增大内存、设置 <code>NCORE</code>、大超胞用 <code>LREAL=Auto</code>、检查 <code>/dev/shm</code>。</li>
+</ul>
+
+<h3>Q8. 空间群没有显示?</h3>
+<p>空间群识别依赖 <code>spglib</code>。运行 <code>pip install spglib</code> 后即可在菜单 10 显示;未安装不影响其他功能。</p>
+
+<div class="page-break"></div>
+
+<!-- ============ 12 附录 ============ -->
+<h1>12 附录</h1>
+
+<h2>A. 各晶系独立弹性常数数目</h2>
+<table>
+  <tr><th>晶系</th><th>独立弹性常数</th></tr>
+  <tr><td>三斜 (Triclinic)</td><td>21</td></tr>
+  <tr><td>单斜 (Monoclinic)</td><td>13</td></tr>
+  <tr><td>正交 (Orthorhombic)</td><td>9</td></tr>
+  <tr><td>四方 4/m (Tetragonal-II)</td><td>7</td></tr>
+  <tr><td>四方 4/mmm (Tetragonal-I)</td><td>6</td></tr>
+  <tr><td>三方 -3 (Trigonal-II)</td><td>7</td></tr>
+  <tr><td>三方 -3m (Trigonal-I)</td><td>6</td></tr>
+  <tr><td>六方 (Hexagonal)</td><td>5</td></tr>
+  <tr><td>立方 (Cubic)</td><td>3</td></tr>
+</table>
+
+<h2>B. 术语表</h2>
+<table>
+  <tr><th>缩写/术语</th><th>含义</th></tr>
+  <tr><td>MLFF</td><td>机器学习力场(Machine-Learning Force Field),VASP 的 ML_LMLFF 功能。</td></tr>
+  <tr><td>SC-SS</td><td>单分量应力-应变法(Single-Component Stress-Strain)。</td></tr>
+  <tr><td>SA-SS</td><td>对称化应力-应变法(Symmetry-Adapted Stress-Strain)。</td></tr>
+  <tr><td>VRH</td><td>Voigt-Reuss-Hill 多晶平均。</td></tr>
+  <tr><td>Birch / Brugger</td><td>未修正 / 经残余压力(Wallace)修正后的弹性常数。</td></tr>
+  <tr><td>Born 稳定性</td><td>晶体力学稳定的弹性常数判据。</td></tr>
+  <tr><td>θ<sub>D</sub></td><td>德拜温度。</td></tr>
+  <tr><td>QHA / PIMD</td><td>准简谐近似 / 路径积分分子动力学(含核量子效应)。</td></tr>
+</table>
+
+<hr>
+<p class="muted" style="text-align:center;">
+M-HEC 软件使用说明书 · 版本 1.0 · 开发者 冯幸(Dr. Xing Feng)· fengxing@amgm.ac.cn<br>
+© M-HEC Project. 保留所有权利。
+</p>
+</div>
+</body>
+</html>

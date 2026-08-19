@@ -1,0 +1,10 @@
+# MHEC VC Stress-Strain Data: mode ortho (target C11-C12)
+# Units: strain (dimensionless), Cij-convention stress (GPa)
+# Only symmetry-allowed components; each column maps to its elastic constant
+strain	s1(xx)[C11-C12]_meas	C11-C12_fit	s2(yy)[C12-C11]_meas	C12-C11_fit
+-3.000000e-02	-2.697169e+01	-2.719782e+01	2.742472e+01	2.719621e+01
+-2.000000e-02	-1.816989e+01	-1.826149e+01	1.834449e+01	1.826052e+01
+-1.000000e-02	-9.158526e+00	-9.169631e+00	9.181116e+00	9.169173e+00
+1.000000e-02	9.183087e+00	9.169631e+00	-9.162678e+00	-9.169173e+00
+2.000000e-02	1.835121e+01	1.826149e+01	-1.817219e+01	-1.826052e+01
+3.000000e-02	2.742441e+01	2.719782e+01	-2.696878e+01	-2.719621e+01

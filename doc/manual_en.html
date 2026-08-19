@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>M-HEC User Manual, Version 1.0.0</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+         font-size: 10.5pt; line-height: 1.55; color: #1a1a1a;
+         max-width: 900px; margin: 0 auto; padding: 24px 28px; }
+  h1 { font-size: 22pt; margin: 0 0 4px; color: #0b3d62; letter-spacing: .3px; }
+  h2 { font-size: 14pt; margin: 26px 0 8px; padding-bottom: 4px;
+       border-bottom: 2px solid #0b3d62; color: #0b3d62; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 16px 0 6px; color: #14507f; page-break-after: avoid; }
+  .sub { color: #555; font-size: 10.5pt; margin: 0 0 2px; }
+  .meta { background: #f4f7fa; border: 1px solid #d6e0e8; border-radius: 5px;
+          padding: 10px 14px; margin: 14px 0 6px; font-size: 9.8pt; }
+  .meta span { display: inline-block; margin-right: 22px; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0 14px;
+          font-size: 9.8pt; page-break-inside: avoid; }
+  th, td { border: 1px solid #c9d4dd; padding: 5px 9px; text-align: left;
+           vertical-align: top; }
+  th { background: #eaf1f7; font-weight: 600; }
+  td.num, th.num { width: 46px; text-align: center; }
+  code { background: #f2f4f6; border: 1px solid #e0e4e8; border-radius: 3px;
+         padding: 1px 4px; font-family: Consolas, "Courier New", monospace;
+         font-size: 9.3pt; }
+  pre { background: #f7f9fa; border: 1px solid #dde4ea; border-left: 3px solid #0b3d62;
+        border-radius: 4px; padding: 9px 12px; overflow-x: auto;
+        font-family: Consolas, "Courier New", monospace; font-size: 9.2pt;
+        line-height: 1.42; page-break-inside: avoid; }
+  pre code { background: none; border: none; padding: 0; font-size: inherit; }
+  .note { background: #fff8e6; border-left: 3px solid #d9a400;
+          padding: 8px 12px; margin: 10px 0; font-size: 9.8pt; }
+  .tip { background: #eef7f0; border-left: 3px solid #2e7d4f;
+         padding: 8px 12px; margin: 10px 0; font-size: 9.8pt; }
+  .eq { text-align: center; font-family: Consolas, monospace; font-size: 10.5pt;
+        margin: 10px 0; }
+  ul, ol { margin: 6px 0 10px; padding-left: 22px; }
+  li { margin: 3px 0; }
+  .toc { background: #fafbfc; border: 1px solid #dde4ea; border-radius: 5px;
+         padding: 12px 18px; font-size: 9.8pt; }
+  .toc ol { margin: 4px 0; }
+  footer { margin-top: 30px; padding-top: 10px; border-top: 1px solid #d6e0e8;
+           font-size: 9pt; color: #666; text-align: center; }
+  .pb { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<h1>M-HEC User Manual</h1>
+<p class="sub">MLFF-Enhanced High-Temperature Elastic Constants</p>
+<div class="meta">
+  <span><strong>Version</strong> 1.0.0</span>
+  <span><strong>Author</strong> Dr. Feng Xing</span>
+  <span><strong>Email</strong> fengxing@amgm.ac.cn</span>
+  <span><strong>License</strong> MIT</span>
+</div>
+
+<div class="toc">
+<strong>Contents</strong>
+<ol>
+  <li>Introduction and theory</li>
+  <li>Installation</li>
+  <li>Input files and directory layout</li>
+  <li>The command-line interface</li>
+  <li>Deformation schemes, SC-SS and SA-SS</li>
+  <li>Menu reference, items 1 to 12</li>
+  <li>Fitting and the joint solver</li>
+  <li>Pressure correction and stability</li>
+  <li>Output files</li>
+  <li>Configuration and batch mode</li>
+  <li>Worked example, diamond</li>
+  <li>Troubleshooting</li>
+</ol>
+</div>
+
+<h2>1. Introduction and theory</h2>
+
+<p>M-HEC computes single-crystal elastic constants at finite temperature by
+combining VASP <em>ab initio</em> molecular dynamics with on-the-fly
+machine-learning force fields and symmetry-adapted stress-strain sampling. The
+elastic tensor is obtained from the stress response to finite strains through
+the generalised Hooke law</p>
+
+<div class="eq">sigma<sub>i</sub> = C<sub>ij</sub> eps<sub>j</sub>, &nbsp; i, j = 1 to 6 (Voigt notation)</div>
+
+<p>Here <em>I</em> and <em>J</em> are Voigt indices from 1 to 6 that label the
+stress and strain components. For each temperature the equilibrium lattice is
+first obtained from an NPT simulation, deformations are then sampled under
+fixed-cell NVT conditions, and the time-averaged stresses are regressed against
+the applied strain.</p>
+
+<h3>1.1 Strain-domain consistency</h3>
+
+<p>The central design principle is that the force field is trained and validated
+over the same strain range, and at the same thermal-expansion-equilibrium lattice,
+that are later used for the elastic measurement. The elastic constants are then
+obtained by interpolation inside the training domain rather than by
+extrapolation outside it. Accuracy in the strained and stressed configurations
+that determine the elastic constants is further preserved by an elevated stress
+weight during training, odd-polynomial debiasing of the fit, and a
+residual-pressure correction.</p>
+
+<div class="note"><strong>Scope.</strong> Strain-domain consistency guarantees
+interpolation rather than extrapolation. It does not by itself guarantee
+accuracy, which remains contingent on the quality of the underlying
+first-principles reference.</div>
+
+<h3>1.2 Capabilities</h3>
+<ul>
+  <li>Automatic identification of the crystal system and Laue class, with optional space-group input. All seven crystal systems, nine Laue classes, are supported.</li>
+  <li>Two complementary deformation schemes, SC-SS and SA-SS.</li>
+  <li>A single symmetry-parameterised, R-squared-weighted joint least-squares solver shared by both schemes, returning every independent constant with a fit standard error.</li>
+  <li>Robust per-channel slope fitting with automatic model selection.</li>
+  <li>Wallace residual-pressure diagnostics and the Birch to Brugger conversion.</li>
+  <li>Born mechanical-stability checking.</li>
+  <li>MLFF training and energy, force and stress parity validation.</li>
+  <li>Post-processing of mechanical properties and of AIMD trajectories.</li>
+  <li>Equilibrium lattice and thermal-expansion analysis.</li>
+</ul>
+
+<h2>2. Installation</h2>
+
+<table>
+<tr><th>Component</th><th>Requirement</th></tr>
+<tr><td>Python</td><td>3.8 or newer</td></tr>
+<tr><td>numpy</td><td>required</td></tr>
+<tr><td>VASP</td><td>6.x recommended, for AIMD and on-the-fly MLFF</td></tr>
+<tr><td>matplotlib</td><td>optional, diagnostic figures</td></tr>
+<tr><td>spglib</td><td>optional but recommended, reliable Laue-class detection</td></tr>
+<tr><td>pyyaml</td><td>optional, YAML configuration files</td></tr>
+</table>
+
+<h3>2.1 Installing from the source archive</h3>
+<p>Unpack the distributed tarball, enter the extracted directory and install from
+it. This is the recommended route.</p>
+<pre><code>tar -xzf mhec-1.0.0.tar.gz
+cd mhec-1.0.0
+pip install .</code></pre>
+
+<p>To include the optional plotting dependencies, replace the last command with
+the following.</p>
+<pre><code>pip install ".[full]"</code></pre>
+
+<p>If the account has no write access to the system site-packages, install into
+the user tree instead.</p>
+<pre><code>pip install --user .</code></pre>
+
+<h3>2.2 Alternative routes</h3>
+<p>Installation from the wheel, which requires no unpacking.</p>
+<pre><code>pip install --force-reinstall --no-deps mhec-1.0.0-py3-none-any.whl</code></pre>
+
+<p>Installation directly from the archive, which pip can read without unpacking.</p>
+<pre><code>pip install mhec-1.0.0.tar.gz</code></pre>
+
+<h3>2.3 Verifying the installation</h3>
+<pre><code>mhec --version</code></pre>
+
+<p>If the <code>mhec</code> command is not found after a user installation, add
+the user script directory to the search path.</p>
+<pre><code>export PATH="$HOME/.local/bin:$PATH"</code></pre>
+
+<div class="tip"><strong>Upgrading.</strong> When reinstalling over an existing
+copy, add <code>--force-reinstall</code>. Adding <code>--no-deps</code> as well
+keeps the already satisfied dependencies untouched, which is convenient on
+clusters with restricted network access.</div>
+
+<h2>3. Input files and directory layout</h2>
+
+<p>Prepare a working directory containing the following files before launching
+the program.</p>
+
+<table>
+<tr><th>File</th><th>Role</th></tr>
+<tr><td><code>POSCAR</code></td><td>structure of the reference cell, required</td></tr>
+<tr><td><code>POTCAR</code></td><td>pseudopotentials, copied into every generated directory</td></tr>
+<tr><td><code>KPOINTS</code></td><td>k-point mesh</td></tr>
+<tr><td><code>INCAR</code></td><td>template, its key settings are inherited and adapted</td></tr>
+<tr><td><code>run.sh</code></td><td>cluster submission template, its resource and environment lines are reused</td></tr>
+<tr><td><code>ML_FF</code></td><td>optional pre-trained force field, enables run-only mode</td></tr>
+</table>
+
+<div class="tip"><strong>Environment.</strong> The submission template should
+load its own environment, for example <code>source ~/.bashrc</code> followed by
+<code>conda activate</code> or <code>module load</code>. Scripts that rely on
+inheriting an interactive shell environment may fail when the job is started by
+a batch driver on a different node.</div>
+
+<h2>4. The command-line interface</h2>
+
+<p>Launch the interactive interface with</p>
+<pre><code>mhec</code></pre>
+
+<p>The header reports the version, the detected system, the temperatures and the
+strain settings. The numbered menu is grouped into four blocks, Elastic
+Constants, Post-processing, Machine-Learning Force Field and Utilities. Item
+<code>L</code> switches the interface language and item <code>0</code> exits.</p>
+
+<p>A typical session proceeds as follows.</p>
+<ol>
+  <li>Item 10, confirm the crystal system and lattice parameters.</li>
+  <li>Item 7 or 8, train a force field, then item 9 to validate its accuracy.</li>
+  <li>Item 12, obtain the equilibrium lattice at each temperature.</li>
+  <li>Item 1 or 3, generate the elastic-constant inputs, then submit them.</li>
+  <li>Item 2 or 4, fit the elastic constants.</li>
+  <li>Item 5, post-process the mechanical properties.</li>
+</ol>
+
+<h2 class="pb">5. Deformation schemes</h2>
+
+<h3>5.1 SC-SS, Single-Component Stress-Strain</h3>
+<p>Each deformation activates a single Voigt strain component, so one deformation
+probes a complete column of the stiffness matrix. The scheme is general and
+applies to every crystal system, and it is the natural choice for low-symmetry
+crystals where many independent constants must be covered.</p>
+
+<h3>5.2 SA-SS, Symmetry-Adapted Stress-Strain</h3>
+<p>Deformations are matched to the symmetry of the crystal so as to maximise the
+measured stress signal. Volume-conserving shears are used for the shear block,
+and deviatoric strains are used for combinations such as C11 minus C12, which is
+more accurate than taking the difference of two large uniaxial numbers. For
+hexagonal, tetragonal and trigonal systems an <code>ortho_ac</code> mode with
+strain (delta, a, minus delta), where a equals delta squared divided by one minus
+delta squared, measures C11 plus C33 minus twice C13 through the strong
+differential signal of the first minus the third normal stress, which places a
+tight constraint on C13.</p>
+
+<p>Representative relations between the measured stress slope and the elastic
+constants are collected below.</p>
+
+<table>
+<tr><th>Mode</th><th>Measured combination</th><th>Relation</th></tr>
+<tr><td>uniaxial</td><td>single normal strain</td><td>sigma<sub>i</sub>' = C<sub>iJ</sub></td></tr>
+<tr><td>deviatoric ab</td><td>C11 minus C12</td><td>C11 minus C12 = sigma<sub>1</sub>'</td></tr>
+<tr><td><code>ortho_ac</code></td><td>C11 plus C33 minus 2 C13</td><td>= sigma<sub>1</sub>' minus sigma<sub>3</sub>'</td></tr>
+<tr><td>volume-conserving shear</td><td>C44</td><td>sigma<sub>4</sub>' = 2 C44, hence C44 = sigma<sub>4</sub>' divided by 2</td></tr>
+<tr><td>single-component shear</td><td>C44, low symmetry</td><td>sigma<sub>4</sub>' = C44</td></tr>
+</table>
+
+<div class="note">The factor of two for volume-conserving shear follows from the
+engineering strain convention, eps<sub>4</sub> equals twice the tensor component
+eps<sub>yz</sub>. Both schemes are processed by the same solver and write the
+same output files, so their results can be compared directly.</div>
+
+<h2>6. Menu reference</h2>
+
+<h3>6.1 Elastic Constants</h3>
+<table>
+<tr><th class="num">Item</th><th>Function</th><th>Notes</th></tr>
+<tr><td class="num">1</td><td>SC-SS, generate inputs</td>
+    <td>Builds one directory per deformation and amplitude, copies POTCAR, KPOINTS, adapted INCAR and the submission script, and writes a batch submission driver.</td></tr>
+<tr><td class="num">2</td><td>SC-SS, fit elastic constants</td>
+    <td>Collects the averaged stresses, fits the slopes, solves the tensor, prints the raw and symmetrized matrices, writes the report and the diagnostic figures.</td></tr>
+<tr><td class="num">3</td><td>SA-SS, generate inputs</td>
+    <td>As item 1 but using the symmetry-adapted mode set for the detected Laue class.</td></tr>
+<tr><td class="num">4</td><td>SA-SS, fit elastic constants</td>
+    <td>As item 2. The screen output, provenance report and file set are identical in format to the SC-SS route.</td></tr>
+</table>
+
+<h3>6.2 Post-processing</h3>
+<table>
+<tr><th class="num">Item</th><th>Function</th><th>Notes</th></tr>
+<tr><td class="num">5</td><td>Elastic post-processing</td>
+    <td>Voigt, Reuss and Hill moduli, universal anisotropy index, direction-dependent moduli and Poisson ratio, Debye temperature and sound velocities.</td></tr>
+<tr><td class="num">6</td><td>AIMD post-processing</td>
+    <td>Analyses NPT and NVT trajectories, for example radial distribution functions, mean square displacement and structural or transport indicators.</td></tr>
+</table>
+
+<h3>6.3 Machine-Learning Force Field</h3>
+<table>
+<tr><th class="num">Item</th><th>Function</th><th>Notes</th></tr>
+<tr><td class="num">7</td><td>MLFF training, isothermal</td>
+    <td>Trains at a fixed target temperature. The workflow is train, refit, run. An elevated stress weight preserves accuracy in the stressed configurations that determine the elastic constants.</td></tr>
+<tr><td class="num">8</td><td>MLFF training, heating ramp</td>
+    <td>Trains along a temperature ramp so that one force field covers the whole temperature range. Training stages are chained and a final refit is submitted automatically.</td></tr>
+<tr><td class="num">9</td><td>MLFF accuracy validation</td>
+    <td>Parity of energy, force components and stress against DFT, with RMSE and MAE. Validation should be performed on the same strain domain that is used for the elastic measurement.</td></tr>
+</table>
+
+<h3>6.4 Utilities</h3>
+<table>
+<tr><th class="num">Item</th><th>Function</th><th>Notes</th></tr>
+<tr><td class="num">10</td><td>Crystal system and lattice parameters</td>
+    <td>Lattice parameters and volume, composition, molar mass and density, crystal system and Laue class, number of independent constants, and the space group when spglib is available.</td></tr>
+<tr><td class="num">11</td><td>Deformation modes and strain schemes</td>
+    <td>Lists the SC-SS and SA-SS mode sets for the detected crystal system, the amplitude points and the total number of calculations.</td></tr>
+<tr><td class="num">12</td><td>Equilibrium lattice and thermal expansion</td>
+    <td>Extracts the NPT equilibrium lattice at each temperature and derives the linear and volumetric thermal-expansion coefficients. Run this before the fixed-cell NVT deformations.</td></tr>
+</table>
+
+<div class="tip"><strong>Recommended order.</strong> Force field, item 7 or 8,
+then validation, item 9, then equilibrium lattice, item 12, then deformations,
+items 1 to 4, then properties, item 5. The equilibrium lattice must correspond
+to the same temperature as the subsequent NVT sampling.</div>
+
+<h2 class="pb">7. Fitting and the joint solver</h2>
+
+<h3>7.1 Robust per-channel slope fitting</h3>
+<p>For every stress channel the slope at vanishing strain is determined with an
+automatic model selection.</p>
+<ol>
+  <li>An odd polynomial through the origin, sigma equal to a times eps plus b times eps cubed, is fitted and the linear coefficient a is taken as the slope. The odd form removes the bias introduced by the leading anharmonic term and ignores the even, volumetric part by construction. At least six non-zero points are required.</li>
+  <li>If the odd polynomial does not improve on a linear fit through the origin, the linear form is used instead, which prevents over-fitting of the cubic term.</li>
+  <li>If the selected model still does not reach the quality threshold, the outermost strain points are removed successively and the slope is taken from the largest small-strain window that reaches the threshold. Such channels are labelled as narrowed.</li>
+</ol>
+
+<h3>7.2 Symmetry-parameterised weighted joint solution</h3>
+<p>Rather than assigning one deformation to one constant, all equations from all
+deformations and all stress components are assembled into a single overdetermined
+system. The stiffness matrix is parameterised by the symmetry of the crystal, so
+that only the independent constants remain as unknowns, and the system is solved
+by least squares with weights derived from the fit quality of each channel.
+Clean channels dominate the solution while noisy channels are suppressed, which
+removes the ambiguity of obtaining several inconsistent estimates for the same
+constant. Uncertainties are propagated from the weighted residual covariance and
+are reported for every independent constant.</p>
+
+<h3>7.3 Reading the provenance report</h3>
+<p>The provenance file lists the strong stress-slope equations that were used,
+then every independent constant in the form
+<code>C_ij = value +/- standard error GPa</code> followed by the channels that
+constrain it. Channels whose fit quality falls below the threshold are listed in
+a separate block and flagged, narrowed channels are identified, and constants
+that are poorly constrained are marked so that they are not adopted without
+further checking.</p>
+
+<div class="note"><strong>Interpreting a large error bar.</strong> A constant
+reported with an unusually large standard error, or one whose only channel is
+flagged as weak, has not been reliably measured. Typical remedies are to raise
+the sampling temperature so that soft modes are thermally activated, to add
+amplitude points and extend the NVT sampling for that channel, and to check the
+force-field accuracy for the corresponding deformation.</div>
+
+<h2>8. Pressure correction and stability</h2>
+
+<p>The residual hydrostatic pressure of the reference configuration and the
+anisotropy of the normal stresses are reported as a diagnostic. When the
+magnitude of the residual pressure exceeds 0.5 GPa the Birch coefficients
+obtained from the fit are converted to Brugger coefficients, which are the
+quantities to be compared with experiment. Below that threshold the correction is
+negligible and is reported for information only. Born mechanical stability is
+evaluated for the symmetrized tensor of the relevant crystal system, and any
+violated condition is listed explicitly.</p>
+
+<h2>9. Output files</h2>
+
+<table>
+<tr><th>File</th><th>Content</th></tr>
+<tr><td><code>elastic_constants.txt</code></td><td>Full report, calculation parameters, raw matrix, symmetrized Birch matrix, Wallace diagnostics, Brugger matrix, Born stability, mechanical properties.</td></tr>
+<tr><td><code>elastic.txt</code></td><td>Plain 6 by 6 matrix in GPa, the recommended values, convenient for external programs.</td></tr>
+<tr><td><code>elastic_birch.txt</code></td><td>Uncorrected Birch matrix, written when the pressure correction has been applied.</td></tr>
+<tr><td><code>fit_solution.txt</code></td><td>SC-SS provenance, how each constant is solved, with standard errors and channel flags.</td></tr>
+<tr><td><code>vcfit_solution.txt</code></td><td>SA-SS provenance, identical format.</td></tr>
+<tr><td><code>fit_*.png</code>, <code>vcfit_*.png</code></td><td>Stress-strain diagnostic plots for the strong channels, annotated with the measured combination, the slope and the fit quality.</td></tr>
+<tr><td><code>fit_r2_heatmap.png</code></td><td>Fit-quality heat map. Symmetry-zero and weak channels are shown in grey and are excluded from the display.</td></tr>
+<tr><td><code>fit_*_GPa.dat</code></td><td>Measured and fitted curves in GPa, one column per strong channel, ready for external plotting.</td></tr>
+</table>
+
+<h2>10. Configuration and batch mode</h2>
+
+<pre><code># batch mode
+mhec --poscar POSCAR --temp 1000 --strain 0.005 --batch
+
+# with a configuration file
+mhec --config mhec.yaml --batch --poscar POSCAR</code></pre>
+
+<table>
+<tr><th>Option</th><th>Description</th></tr>
+<tr><td><code>--poscar</code></td><td>path to the POSCAR file</td></tr>
+<tr><td><code>--primitive</code></td><td>primitive-cell POSCAR, used for crystal-system detection</td></tr>
+<tr><td><code>--crystal-system</code></td><td>force the crystal system, overriding automatic detection</td></tr>
+<tr><td><code>--temp</code></td><td>temperature or list of temperatures in K</td></tr>
+<tr><td><code>--strain</code></td><td>base strain amplitude delta</td></tr>
+<tr><td><code>--method</code></td><td>advanced strain scheme, standard or ulics</td></tr>
+<tr><td><code>--batch</code></td><td>non-interactive batch mode</td></tr>
+<tr><td><code>--config</code></td><td>path to a YAML or JSON configuration file</td></tr>
+<tr><td><code>--version</code></td><td>print the version and exit</td></tr>
+</table>
+
+<pre><code># mhec.yaml
+temperatures: [300, 600, 900, 1200, 1500]
+magnitude: 0.005          # base amplitude delta
+n_points: 9               # 3, 5, 7, 9 or 11
+elastic_method: sa        # sa = SA-SS, sc = SC-SS
+fit_poly_order: 3         # 3 = odd polynomial, 1 = linear
+space_group: 92           # optional, most reliable route to the Laue class
+crystal_tol: 0.01
+skip_steps: 500           # MD steps discarded before averaging
+vasp:
+  encut: 600
+  nsw_train: 2000
+  nsw_run: 10000
+  potim: 1.0</code></pre>
+
+<p>Strain sampling may be given in three equivalent ways, with the priority
+<code>strain_points</code>, then <code>max_strain</code> together with
+<code>n_points</code>, then <code>magnitude</code> together with
+<code>n_points</code>. With <code>magnitude</code> equal to 0.005 and
+<code>n_points</code> equal to 9 the non-zero strains are plus and minus 0.005,
+0.010, 0.015 and 0.020. Default point counts follow the symmetry, five for cubic
+and hexagonal, seven for tetragonal, trigonal and orthorhombic, and nine for
+monoclinic and triclinic.</p>
+
+<h2>11. Worked example, diamond</h2>
+
+<p>The distribution contains a diamond test case under
+<code>examples/diamond</code> with three stages, <code>mlff_train</code>,
+<code>eval_mlff</code> and <code>elastic</code>. Following the recommended order
+gives, for the frozen force field, parity errors of the order of
+0.0002 eV per atom for the energy, 0.05 eV per angstrom for the force components
+and 1 kbar for the stress, and it reproduces the measured elastic constants of
+diamond and their temperature dependence over the range 300 to 1500 K. The
+example also illustrates the comparison of the SC-SS and SA-SS routes on the same
+data set.</p>
+
+<h2>12. Troubleshooting</h2>
+
+<table>
+<tr><th>Symptom</th><th>Likely cause and remedy</th></tr>
+<tr><td>A constant carries a very large error bar</td><td>Its only channel is weak. Raise the temperature so that soft modes are activated, add amplitude points, extend the NVT sampling, and check the force field for that deformation.</td></tr>
+<tr><td>Poor or negative fit quality for one channel</td><td>The strain amplitude exceeds the linear range, or the response is strongly anharmonic. Reduce delta to about 0.005 to 0.01. The automatic small-strain window will also narrow the fit and label the channel.</td></tr>
+<tr><td>A constant that should vanish is non-zero</td><td>Insufficient sampling or an incorrect Laue class. Provide the space group in the configuration file, which is the most reliable route.</td></tr>
+<tr><td>Born stability is not satisfied</td><td>Check the equilibrium lattice for the temperature in question, verify that no phase transition has occurred, and confirm that the residual pressure is small.</td></tr>
+<tr><td>Elastic constants are far too stiff for a framework or multi-atom-basis crystal</td><td>Static deformations were not allowed to relax the internal ions, so the clamped-ion tensor was obtained. Relax the ions at the fixed deformed cell, that is move the ions only and keep the imposed strain.</td></tr>
+<tr><td>The crystal system is detected as triclinic for an MD snapshot</td><td>Thermal displacements break the apparent symmetry. Use a time-averaged structure with a looser tolerance, or specify the space group explicitly.</td></tr>
+<tr><td>Jobs fail with a missing shared library</td><td>The submission script relies on an inherited environment. Load the environment inside the script itself and make sure the library version matches the executable.</td></tr>
+</table>
+
+<div class="note"><strong>General guidance.</strong> Keep the strain amplitude
+inside the range used for force-field training. For soft framework materials the
+linear range can be narrow, so amplitudes of about 0.005 to 0.01 are preferable
+to 0.03. Except for monatomic Bravais lattices, static stress-strain
+calculations must relax the internal ions at the fixed deformed cell.</div>
+
+<footer>
+M-HEC 1.0.0 User Manual &nbsp;|&nbsp; Dr. Feng Xing &nbsp;|&nbsp;
+fengxing@amgm.ac.cn &nbsp;|&nbsp; MIT License<br>
+To create a PDF, open this file in a browser and choose Print, then Save as PDF,
+with A4 paper and background graphics enabled.
+</footer>
+
+</body>
+</html>

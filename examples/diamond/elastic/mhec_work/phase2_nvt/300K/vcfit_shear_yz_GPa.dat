@@ -1,0 +1,10 @@
+# MHEC VC Stress-Strain Data: mode shear_yz (target C44)
+# Units: strain (dimensionless), Cij-convention stress (GPa)
+# Only symmetry-allowed components; each column maps to its elastic constant
+strain	s4(yz)[2*C44]_meas	2*C44_fit
+-3.000000e-02	-3.284733e+01	-3.284387e+01
+-2.000000e-02	-2.186782e+01	-2.187581e+01
+-1.000000e-02	-1.094210e+01	-1.093187e+01
+1.000000e-02	1.094228e+01	1.093187e+01
+2.000000e-02	2.186730e+01	2.187581e+01
+3.000000e-02	3.284454e+01	3.284387e+01
